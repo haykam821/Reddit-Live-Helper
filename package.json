@@ -1,3 +1,6 @@
 {
-    "name": "reddit-live-helper"
+    "name": "reddit-live-helper",
+    "dependencies": {
+        "snoowrap": "^1.15.2"
+    }
 }
