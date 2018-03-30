@@ -1,4 +1,4 @@
-const config = require("config.json");
+const config = require("./config.json");
 const snoowrap = require("snoowrap");
 
 const reddit = new snoowrap(config.auth);
