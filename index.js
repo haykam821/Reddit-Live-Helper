@@ -9,9 +9,6 @@ const myself = reddit.getMe();
 const mathjs = require("mathjs");
 
 const thread = reddit.getLivethread("10otrx267owkb");
-function send(msg) {
-    thread.addUpdate(msg);
-}
 
 function makeBlock(msg) {
     const parts = msg.split("\n");
@@ -19,6 +16,9 @@ function makeBlock(msg) {
         return "    " + item;
     }).join("\n");
 }
+function send(msg) {
+    thread.addUpdate(msg);
+};
 
 let lastParsing = null;
 
@@ -26,27 +26,8 @@ thread.stream.on("update", data => {
     const msg = data.body.replace(config.prefix, "");
     if (!data.body.startsWith(config.prefix) || data.author.name === myself.name) return;
 
-    yargs.command("test", "A simple test command.", {
-        "delay": {
-            description: "An addition delay before returning the message.",
-            default: 0,
-            type: "number",
-        }
-    }, args => {
-        setTimeout(function() {
-            send("The test is complete!");
-        }, args.delay);
-    });
-    yargs.command("whoami", "Find out who you are.", {}, args => {
-        send(`You are u/${data.author.name}.`);
-    });
-    yargs.command("debug", "Outputs the debug for the last parsed command.", {}, args => {
-        if (lastParsing) {
-            send(`Here is the debug for the last parsed command:\n\n${makeBlock(lastParsing)}`);
-        } else {
-            send(`I do not remember any previous commands. Sorry!`);
-        }
-    });
+    yargs.commandDir("commands");
+
     //yargs.command("sum", "Gets the sum of the provided numbers.", {}, )
 
     yargs.help(false);
@@ -55,5 +36,11 @@ thread.stream.on("update", data => {
         send(makeBlock(helpText));
     })
 
-    lastParsing = JSON.stringify(yargs.parse(msg), null, 4);
+    lastParsing = JSON.stringify(yargs.parse(msg, {
+        respond: send,
+        makeBlock: makeBlock,
+        previous: lastParsing,
+        data: data,
+        thread: thread,
+    }), null, 4);
 });
