@@ -42,5 +42,9 @@ thread.stream.on("update", data => {
         previous: lastParsing,
         data: data,
         thread: thread,
+        genericError: function() {
+            send(`Oops! Something went wrong. Sorry.`);
+        },
+        reddit: reddit,
     }), null, 4);
 });
